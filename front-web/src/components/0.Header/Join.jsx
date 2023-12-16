@@ -23,37 +23,76 @@ const Join = () => {
     checkName();
   }, [name]);
 
-  // 아이디 관련 변수
-  const [id, setId] = useState("");
-  const [passID, setPassID] = useState();
-  const [passDupID, setPassDupID] = useState(false);
-  const [checkIDText, setCheckIDText] = useState("");
-  const checkID = () => {
-    setPassDupID(false);
-    if (id.length > 4 && id.length < 11) {
-      setPassID(true);
-      setCheckIDText("* 아이디 중복 확인을 해주세요.");
-    } else if (id == "") {
-      setPassID();
-      setCheckIDText();
+  // 보드명 관련 변수
+  const [board, setBoard] = useState("");
+  const [passBoard, setPassBoard] = useState();
+  const [passDupBoard, setPassDupBoard] = useState(false);
+  const [checkBoardText, setCheckBoardText] = useState("");
+  const checkBoard = () => {
+    setPassDupBoard(false);
+    if (board.length > 1 && board.length < 7) {
+      setPassBoard(true);
+      setCheckBoardText("* 보드명 중복 확인을 해주세요.");
+    } else if (board == "") {
+      setPassBoard();
+      setCheckBoardText();
     } else {
-      setPassID(false);
-      setCheckIDText("* 올바른 아이디를 입력해주세요.");
+      setPassBoard(false);
+      setCheckBoardText("* 올바른 보드명을 입력해주세요.");
     }
   };
   useEffect(() => {
-    checkID();
-  }, [id]);
+    checkBoard();
+  }, [board]);
 
-  const checkDupID = () => {
-    axios.post("/user/join/idDupCheck", { id: id }).then((res) => {
-      if (res.data.idDupResult) {
-        setPassID(true);
-        setPassDupID(true);
-        setCheckIDText("* 사용가능한 아이디 입니다.");
-      } else {
-        setPassID(false);
-        setCheckIDText("* 중복된 아이디 입니다.");
+  const checkDupBoard = () => {
+    axios.post("/user/join/checkDupBoard", { board: board }).then((res) => {
+      if (res.data.checkDupBoardResult == board) {
+        setPassBoard(true);
+        setCheckBoardText("* 사용가능한 보드명 입니다.");
+        setPassDupBoard(true);
+      } else if(res.data.checkDupBoardResult) {
+        setPassBoard(false);
+        setCheckBoardText("* 중복된 보드명 입니다.");
+      } else{
+        alert("[NETWORK ERROR] 다시 시도해주세요.")
+      }
+    });
+  };
+
+  // 이메일 관련 변수
+  const [email, setEmail] = useState("");
+  const [passEmail, setPassEmail] = useState();
+  const [passDupEmail, setPassDupEmail] = useState(false);
+  const [checkEmailText, setCheckEmailText] = useState("");
+  const checkEmail = () => {
+    setPassDupEmail(false);
+    if (email.includes("@") && email.includes(".")) {
+      setPassEmail(true);
+      setCheckEmailText("* 이메일 중복 확인을 해주세요.");
+    } else if (email == "") {
+      setPassEmail();
+      setCheckEmailText();
+    } else {
+      setPassEmail(false);
+      setCheckEmailText("* 올바른 이메일을 입력해주세요.");
+    }
+  };
+  useEffect(() => {
+    checkEmail();
+  }, [email]);
+
+  const checkDupEmail = () => {
+    axios.post("/user/join/checkDupEmail", { email: email }).then((res) => {
+      if (res.data.checkDupEmailResult == email) {
+        setPassEmail(true);
+        setPassDupEmail(true);
+        setCheckEmailText("* 사용가능한 이메일 입니다.");
+      } else if(res.data.checkDupEmailResult){
+        setPassEmail(false);
+        setCheckEmailText("* 중복된 이메일 입니다.");
+      } else{
+        alert("[NETWORK ERROR] 다시 시도해주세요.")
       }
     });
   };
@@ -98,41 +137,6 @@ const Join = () => {
     checkRePW();
   }, [rePw]);
 
-  // 닉네임 관련 변수
-  const [nick, setNick] = useState("");
-  const [passNick, setPassNick] = useState();
-  const [passDupNick, setPassDupNick] = useState(false);
-  const [checkNickText, setCheckNickText] = useState("");
-  const checkNick = () => {
-    setPassDupNick(false);
-    if (nick.length > 1 && nick.length < 7) {
-      setPassNick(true);
-      setCheckNickText("* 닉네임 중복 확인을 해주세요.");
-    } else if (nick == "") {
-      setPassNick();
-      setCheckNickText();
-    } else {
-      setPassNick(false);
-      setCheckNickText("* 올바른 닉네임을 입력해주세요.");
-    }
-  };
-  useEffect(() => {
-    checkNick();
-  }, [nick]);
-
-  const checkDupNick = () => {
-    axios.post("/user/join/nickDupCheck", { nick: nick }).then((res) => {
-      if (res.data.nickDupResult) {
-        setPassNick(true);
-        setCheckNickText("* 사용가능한 닉네임 입니다.");
-        setPassDupNick(true);
-      } else {
-        setPassNick(false);
-        setCheckNickText("* 중복된 닉네임 입니다.");
-      }
-    });
-  };
-
   // 한줄 소개 관련 변수
   const [intro, setIntro] = useState("");
   const [passIntro, setPassIntro] = useState(false);
@@ -147,22 +151,39 @@ const Join = () => {
     checkIntro();
   }, [intro]);
 
-  const loginData = {
-    name:name,
-    nick: nick,
-    email: id,
-    pw: pw,
-    intro: intro
-  };
-
-  const join = () => {
-    if (passDupID && passDupNick && passPW && passRePW && passName) {
-      // nav("/join/userdata", { state: { loginData: loginData } });
-      console.log(loginData);
+  const checkUserInput = () => {
+    if (passDupEmail && passDupBoard && passPW && passRePW && passName) {
+      join();
     } else {
       alert("회원가입 정보를 올바르게 입력해주세요.");
     }
   };
+
+  const join = ()=>{
+    axios.post('/user/join',
+    {email: email,
+      pw: pw,
+      name:name,
+      board: board,
+      intro: intro})
+    .then((res) => {
+      if(res.data.joinResult){
+        alert("회원가입이 완료되었습니다.")
+        localStorage.setItem("loginData", JSON.stringify(
+          {user_email: email,
+            user_name:name,
+            user_board: board,
+            user_profile_img: null,
+            joined_type: "general",
+            user_intro: intro
+        }))
+        nav('/')
+      }else{
+        alert("[NETWORK ERROR] 다시 시도해주세요.")
+      }
+    })
+
+  }
 
   return (
     <JoinBack>
@@ -184,7 +205,7 @@ const Join = () => {
                 )}
           </CheckBox>
           <input
-            className="pwInput"
+            className="normalInput"
             type="text"
             placeholder="이름"
             value={name}
@@ -196,11 +217,11 @@ const Join = () => {
         <Warning></Warning>
         <Input>
           <CheckBox>
-            {passNick == null ? (
+            {passBoard == null ? (
               <RiCheckboxBlankCircleLine className="init" />
             ) : (
               <>
-                {passNick ? (
+                {passBoard ? (
                   <AiOutlineCheckCircle className="pass" />
                 ) : (
                   <AiOutlineCloseCircle className="warn" />
@@ -209,28 +230,28 @@ const Join = () => {
             )}
           </CheckBox>
           <input
-            className="nickInput"
+            className="dupCheckInput"
             type="text"
             placeholder="보드명 (2~6글자)"
-            value={nick}
+            value={board}
             onChange={(e) => {
-              setNick(e.target.value);
+              setBoard(e.target.value);
             }}
           />
-          <DupCheckBox onClick={checkDupNick}>중복확인</DupCheckBox>
+          <DupCheckBox onClick={checkDupBoard}>중복확인</DupCheckBox>
         </Input>
-        {passNick ? (
-          <Passed>{checkNickText}</Passed>
+        {passBoard ? (
+          <Passed>{checkBoardText}</Passed>
         ) : (
-          <Warning>{checkNickText}</Warning>
+          <Warning>{checkBoardText}</Warning>
         )}
         <Input>
           <CheckBox>
-            {passID == null ? (
+            {passEmail == null ? (
               <RiCheckboxBlankCircleLine className="init" />
             ) : (
               <>
-                {passID ? (
+                {passEmail ? (
                   <AiOutlineCheckCircle className="pass" />
                 ) : (
                   <AiOutlineCloseCircle className="warn" />
@@ -239,20 +260,20 @@ const Join = () => {
             )}
           </CheckBox>
           <input
-            className="idInput"
+            className="dupCheckInput"
             type="text"
             placeholder="이메일 (example@gmail.com)"
-            value={id}
+            value={email}
             onChange={(e) => {
-              setId(e.target.value);
+              setEmail(e.target.value);
             }}
           />
-          <DupCheckBox onClick={checkDupID}>중복확인</DupCheckBox>
+          <DupCheckBox onClick={checkDupEmail}>중복확인</DupCheckBox>
         </Input>
-        {passID ? (
-          <Passed>{checkIDText}</Passed>
+        {passEmail ? (
+          <Passed>{checkEmailText}</Passed>
         ) : (
-          <Warning>{checkIDText}</Warning>
+          <Warning>{checkEmailText}</Warning>
         )}
 
         <Input>
@@ -270,7 +291,7 @@ const Join = () => {
             )}
           </CheckBox>
           <input
-            className="pwInput"
+            className="normalInput"
             type="password"
             placeholder="비밀번호 (8자리 이상) "
             value={pw}
@@ -296,7 +317,7 @@ const Join = () => {
             )}
           </CheckBox>
           <input
-            className="pwInput"
+            className="normalInput"
             type="password"
             placeholder="비밀번호 확인"
             value={rePw}
@@ -315,9 +336,9 @@ const Join = () => {
                 )}
           </CheckBox>
           <input
-            className="pwInput"
+            className="normalInput"
             type="text"
-            placeholder="한줄 소개"
+            placeholder="한줄 소개(공백입력 가능)"
             value={intro}
             onChange={(e) => {
               setIntro(e.target.value);
@@ -326,7 +347,7 @@ const Join = () => {
         </Input>
         <Warning></Warning>
       </LoginDataInput>
-      <button onClick={join}>회원 가입</button>
+      <button onClick={checkUserInput}>회원 가입</button>
     </LoginDataBox>
       </JoinBox>
     </JoinBack>
@@ -371,12 +392,11 @@ const LoginDataBox = styled.div`
     background-size: 32px;
     background-position: 10px center;
   }
-  & .nickInput,
-  .idInput {
+  & .dupCheckInput {
     width: 290px;
   }
 
-  & .pwInput {
+  & .normalInput {
     border-radius: 0 10px 10px 0;
     width: 340px;
   }

@@ -11,7 +11,7 @@ import axios from "../../axios";
 
 const Login = () => {
 
-  const [id, setId] = useState('')
+  const [email, setEmail] = useState('')
   const [pw, setPw] = useState('')
 
   // 로그인 유지 체크 여부
@@ -23,22 +23,19 @@ const Login = () => {
   // 로그인 함수
   const login = (e) => {
     e.preventDefault();
-    console.log(id, pw);
-    // axios.post("/user/login", { user: user, id: id, pw: pw }).then((res) => {
-    //   const loginData = res.data.loginResult;
-    //   if (typeof loginData == "object") {
-    //     loginData.id = id;
-    //     loginData.keepLogin = keepLogin;
-    //     attendDate();
-    //     alert(`${loginData.name}(${loginData.nick})님 환영합니다!`);
-    //     localStorage.setItem("loginData", JSON.stringify(loginData));
-    //     window.location.replace("/");
-    //   } else if (loginData) {
-    //     alert("아이디 또는 비밀번호를 확인해주세요!");
-    //   } else {
-    //     alert("알 수 없는 이유로 오류가 발생하였습니다.");
-    //   }
-    // });
+    console.log(email, pw);
+    axios.post("/user/login", { email: email, pw: pw }).then((res) => {
+      const loginData = res.data.loginResult;
+      if (typeof loginData == "object") {
+        alert(`${loginData.user_name}님 환영합니다!`);
+        localStorage.setItem("loginData", JSON.stringify(loginData));
+        window.location.replace("/");
+      } else if (loginData) {
+        alert("아이디 또는 비밀번호를 확인해주세요!");
+      } else {
+        alert("[NETWORK ERROR] 다시 시도해주세요.")
+      }
+    });
   };
 
   return (
@@ -54,9 +51,9 @@ const Login = () => {
           <input
             type="text"
             className="userInput"
-            placeholder="아이디"
+            placeholder="이메일 ex) example@google.com"
             onChange={(e) => {
-              setId(e.target.value);
+              setEmail(e.target.value);
             }}
           />
         </div>

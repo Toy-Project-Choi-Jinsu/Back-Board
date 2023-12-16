@@ -11,7 +11,7 @@ import Join from "./components/0.Header/Join";
 
 function App() {
   return (
-    <div style={{backgroundColor:"whitesmoke"}}>
+    <div>
       <Header />
       <Routes>
         <Route path="/" element={<Main />}>
