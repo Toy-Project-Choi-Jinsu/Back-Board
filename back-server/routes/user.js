@@ -1,5 +1,6 @@
 const express = require("express");
 const jwt = require("jsonwebtoken");
+const getJwtAuth = require("./jwtAuth");
 const router = express.Router();
 const pool = require("../config/database");
 
@@ -99,11 +100,14 @@ router.post("/getUserData", async (req, res) => {
                       from t_user 
                      where user_email = ?`;
   try {
-    const userData = jwt.verify(accessToken, key);
-    console.log("userData : ", userData.user_email);
-    const [getUserDataSqlRows] = await pool.query(getUserDataSql, [userData.user_email]);
-    console.log("Success GetUserData : ", getUserDataSqlRows[0]);
-    res.json({ getUserDataResult: getUserDataSqlRows[0] })
+    const user_email = getJwtAuth(accessToken, key);
+    if (user_email) {
+      const [getUserDataSqlRows] = await pool.query(getUserDataSql, [user_email]);
+      console.log("Success GetUserData : ", user_email);
+      res.json({ getUserDataResult: getUserDataSqlRows[0] })
+    } else {
+      res.json({ getUserDataResult: false })
+    }
   } catch (err) {
     console.log("[GetUserData ERROR] : ", err);
     res.json({ getUserDataResult: false });
