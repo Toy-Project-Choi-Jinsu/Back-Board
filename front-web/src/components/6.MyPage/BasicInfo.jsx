@@ -1,98 +1,128 @@
-import React, { useEffect, useState } from 'react'
+import React, { useContext, useEffect, useState } from 'react'
 import styled from 'styled-components'
 import axios from "../../axios";
 import imageCompression from "browser-image-compression";
 
 import { VscEdit } from "react-icons/vsc";
+import { UserContext } from '../../contexts/UserContext';
 const BasicInfo = () => {
-      // 유저 전체 정보
-  const userData = localStorage.getItem("loginData")
-
-  // 이미지 압축
-  const [img, setImg] = useState({ pre: "", data: "" });
+  // 유저 정보
+  const userData = useContext(UserContext);
+  // 이미지 변경
   const setImage = async (e) => {
-    if (e.target.files[0]) {
-      const options = {
-        maxSizeMB: 0.05, // 이미지 최대 용량
-        maxWidthOrHeight: 500, // 최대 넓이(혹은 높이)
-        useWebWorker: true,
-      };
+    console.log(e.target.files[0]);
+    const file = e.target.files[0];
+    if (file) {
+      const formData = new FormData();
+      formData.append('key', 'c45fbb5e972123a41582662a153f7f38');
+      formData.append('image', file);
+      formData.append('name', userData?.user_email);
+
       try {
-        let compFile = await imageCompression(e.target.files[0], options);
-        setImg({
-          pre: URL.createObjectURL(compFile),
-          data: compFile,
-        });
+        const response = await axios.post('https://api.imgbb.com/1/upload', formData);
+
+        if (response.data.success) {
+          const imageUrl = response.data.data.url;
+          const imageHash = response.data.data.id;
+          axios.post('/mypage/changeImg', { email: userData.user_email, url: imageUrl, hash: imageHash }).then((res) => {
+            if (res.data.chageImgResult) {
+              alert("이미지 변경이 완료되었습니다.")
+              userData.user_profile_img = imageUrl
+              userData.user_profile_img_hash = imageHash
+              localStorage.setItem("loginData", JSON.stringify(userData));
+              window.location.replace('/mypage')
+            } else {
+              alert("이미지 업로드 중 오류가 발생했습니다.");
+            }
+          })
+          console.log("Image URL:", imageUrl);
+        } else {
+          console.error('Image upload failed:', response.data);
+          alert("이미지 업로드 중 오류가 발생했습니다.");
+        }
       } catch (error) {
-        console.log(error);
+        console.error('Error uploading image:', error.message);
+        alert("이미지 업로드 중 오류가 발생했습니다.");
       }
     }
   };
 
-  // 이미지 변환시 데이터 베이스/로컬스토리지에 이미지 저장
-  const sendImg = () => {
-    let formData = new FormData();
-    formData.append("image", img.data);
-    formData.append("id", userData.mem_id);
-    axios
-      .post("/user/changeImg", formData, {
-        headers: {
-          "Content-Type": "multipart/form-data",
-        },
-      })
-      .then((res) => {
-        if (res.data.chageImgResult) {
-          alert("이미지 변경이 완료되었습니다.");
-          window.location.replace("/mypage");
-        } else {
-          alert("이미지 변경이 실패하였습니다.");
-          window.location.replace("/mypage");
-        }
-      });
-  };
-
-  // 이미지 선택을 새로 하는 경우 이미지 저장 함수 실행
-  useEffect(() => {
-    if (img.data != "") {
-      sendImg();
+  const [change, setChange] = useState(false)
+  const [name, setName] = useState(userData?.user_name)
+  const [intro, setIntro] = useState(userData?.user_intro)
+  const showInput = () => {
+    if (change) {
+      if (name == userData?.user_name && intro == userData?.user_intro) {
+        setChange(!change);
+      } else {
+        changeBasicInfo();
+      }
+    } else {
+      setChange(!change);
     }
-  }, [img]);
 
-  // 로컬 스토리지에서 불러온 이미지 데이터 변환
-  const conImg = btoa(
-    String.fromCharCode(...new Uint8Array(userData?.mem_profile_img?.data))
-  );
+  }
+
+  const changeBasicInfo = () => {
+    axios.post('/mypage/changeBasicInfo', { email: userData.user_email, name: name, intro: intro }).then((res) => {
+      if (res.data.changeBasicInfoResult) {
+        alert("기본정보 변경이 완료되었습니다.")
+        userData.user_name = name;
+        userData.user_intro = intro;
+        localStorage.setItem("loginData", JSON.stringify(userData));
+        setChange(!change);
+      } else {
+        alert("[NETWORK ERROR] 다시 시도해주세요.")
+      }
+    })
+  }
+
   return (
     <BasicInfoBox>
-    <ImageBox>
-    <Img>
-      {userData?.mem_profile_img != null ? (
-        <img src={`data:image/png;base64,${conImg}`} alt="유저사진" />
-      ) : (
-        <img
-          src={`${process.env.PUBLIC_URL}/images/User2.png`}
-          alt="기본 유저사진"
+      <ImageBox>
+        <Img>
+          {userData?.user_profile_img != null ? (
+            <img src={userData.user_profile_img} alt="유저사진" />
+          ) : (
+            <img
+              src={`${process.env.PUBLIC_URL}/images/User2.png`}
+              alt="기본 유저사진"
+            />
+          )}
+        </Img>
+        <label htmlFor="file">
+          <VscEdit />
+        </label>
+        <input
+          type="file"
+          id="file"
+          accept="image/*"
+          onChange={(e) => {
+            setImage(e);
+          }}
         />
-      )}
-    </Img>
-    <label htmlFor="file">
-      <VscEdit />
-    </label>
-    <input
-      type="file"
-      id="file"
-      accept="image/*"
-      onChange={(e) => {
-        setImage(e);
-      }}
-    />
-  </ImageBox>
-  <IntroBox>
-  <h1 className='name'>이름</h1>
-  <div className='intro'>한줄소개</div>
-  </IntroBox>
-  
-  </BasicInfoBox>
+      </ImageBox>
+      <IntroBox>
+        {change ?
+          <>
+            <input type='text' className='name' value={name} onChange={(e) => { setName(e.target.value) }} />
+            <input type='text' className='intro' value={intro} onChange={(e) => { setIntro(e.target.value) }} />
+            <div className='btnBox'>
+              <button onClick={showInput}>저장</button>
+            </div>
+          </>
+          :
+          <>
+            <div className='name'>{userData?.user_name}</div>
+            <div className='intro'>{userData?.user_intro}</div>
+            <div className='btnBox'>
+              <button onClick={showInput}>수정</button>
+            </div>
+          </>}
+
+      </IntroBox>
+
+    </BasicInfoBox>
   )
 }
 
@@ -102,20 +132,54 @@ const BasicInfoBox = styled.div`
   display: flex;
   align-items: center;
   justify-content: space-between;
-  width: 50%;
+  width: 65%;
+  margin-bottom: 50px;
+  @media screen and (max-width: 1040px) {
+    flex-direction: column;
+    width: 90%;
+    margin-bottom: 0;
+  }
 `
 const IntroBox = styled.div`
-width: 60%;
-height: 250px;
-border: 1px solid black;
-
+display: flex;
+flex-direction: column;
+justify-content: space-between;
+width: 65%;
+height: 180px;
 & .name{
-  /* font-size: 30px; */
+  font-size: 30px;
+  font-weight: bold;
 }
 
 & .intro{
   font-size: 20px;
+  color: #868e86;
 }
+
+& .btnBox{
+  display: flex;
+  align-items: end;
+  justify-content: end;
+  width: 100%;
+}
+
+& button {
+  width: 50px;
+  height: 35px;
+  border-radius: 17.5px;
+  border-style: none;
+  background-color: #950AFFaa;
+  color: white;
+  font-weight: bold;
+  font-size: 15px;
+  cursor: pointer;
+}
+@media screen and (max-width: 1040px) {
+    width: 100%;
+    height: 150px;
+    border-bottom: 1px solid #bdbdbd;
+    padding-bottom: 10px;
+  }
 
 `
 
@@ -123,7 +187,7 @@ const ImageBox = styled.div`
   display: flex;
   flex-direction: column;
   align-items: center;
-  margin: 60px 0 0 0;
+  margin: 40px 0 0 0;
 
   label {
     position: relative;
@@ -155,14 +219,14 @@ const Img = styled.div`
   display: flex;
   align-items: center;
   justify-content: center;
-  width: 300px;
-  height: 300px;
+  width: 200px;
+  height: 200px;
   border-radius: 50%;
   border: 1px solid #bdbdbd;
   overflow: hidden;
 
   & img {
-    max-width: 300px;
-    max-height: 300px;
+    max-width: 200px;
+    max-height: 200px;
   }
 `;

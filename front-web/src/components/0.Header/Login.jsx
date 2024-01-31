@@ -23,75 +23,79 @@ const Login = () => {
   // 로그인 함수
   const login = (e) => {
     e.preventDefault();
-    console.log(email, pw);
-    axios.post("/user/login", { email: email, pw: pw }).then((res) => {
-      const loginData = res.data.loginResult;
-      if (typeof loginData == "object") {
-        alert(`${loginData.user_name}님 환영합니다!`);
-        localStorage.setItem("loginData", JSON.stringify(loginData));
-        window.location.replace("/");
-      } else if (loginData) {
-        alert("아이디 또는 비밀번호를 확인해주세요!");
-      } else {
-        alert("[NETWORK ERROR] 다시 시도해주세요.")
-      }
-    });
+    try {
+      axios.post("/user/login", { email: email, pw: pw }).then((res) => {
+        const loginData = res.data.loginResult;
+        if (typeof loginData == "string") {
+          alert(`로그인 성공!`);
+          localStorage.setItem("loginData", JSON.stringify(loginData));
+          window.location.replace("/");
+        } else if (loginData) {
+          alert("아이디 또는 비밀번호를 확인해주세요!");
+        } else {
+          alert("[NETWORK ERROR] 다시 시도해주세요.")
+        }
+      });
+    } catch (error) {
+      console.log(error);
+    }
+
   };
 
   return (
     <LoginBack>
-    <LoginBox>
-      <Logo>
-        <Link to="/">
-          <img src={`${process.env.PUBLIC_URL}/images/BackBoardLogo.png`} alt="백보드 로고" />
-        </Link>
-      </Logo>
-      <LoginForm onSubmit={login}>
-        <div>
-          <input
-            type="text"
-            className="userInput"
-            placeholder="이메일 ex) example@google.com"
-            onChange={(e) => {
-              setEmail(e.target.value);
-            }}
-          />
-        </div>
-        <div>
-          <input
-            type="password"
-            className="userInput"
-            placeholder="비밀번호"
-            onChange={(e) => {
-              setPw(e.target.value);
-            }}
-          />
-        </div>
-        <LoginCheckBox onClick={checkKeepLogin}>
-          {keepLogin ? (
-            <AiFillCheckCircle id="check" className="checked" />
-          ) : (
-            <RiCheckboxBlankCircleLine id="check" className="noncheck" />
-          )}
-          <div style={{color:"grey"}}>로그인 상태 유지</div>
-        </LoginCheckBox>
-        <input type="submit" className="btnLogin" value="로그인" />
-      </LoginForm>
-      <div style={{fontSize:"15px", color:"grey"}}>────────── 소셜 로그인 ──────────</div>
-      <SocialLogin>
-        <div className='github'><FaGithub /></div>
-        <div className='google'><FcGoogle /></div>
-        <div className='kakao'><RiKakaoTalkFill /></div>
-      </SocialLogin>
-      <Join>
-        <span>아직 계정이 없으신가요?</span>
-        <Link to="/join" className="goToJoin">
-          회원가입
-        </Link>
-      </Join>
-    </LoginBox>
-  </LoginBack>
-);
+      <LoginBox>
+        <Logo>
+          <Link to="/">
+            <img src={`${process.env.PUBLIC_URL}/images/BackBoardLogo.png`} alt="백보드 로고" />
+          </Link>
+        </Logo>
+        <LoginForm onSubmit={login}>
+          <div>
+            <input
+              type="text"
+              className="userInput"
+              placeholder="이메일 ex) example@google.com"
+              onChange={(e) => {
+                setEmail(e.target.value);
+              }}
+            />
+          </div>
+          <div>
+            <input
+              type="password"
+              className="userInput"
+              placeholder="비밀번호"
+              onChange={(e) => {
+                setPw(e.target.value);
+              }}
+            />
+          </div>
+          <LoginCheckBox onClick={checkKeepLogin}>
+            {keepLogin ? (
+              <AiFillCheckCircle id="check" className="checked" />
+            ) : (
+              <RiCheckboxBlankCircleLine id="check" className="noncheck" />
+            )}
+            <div style={{ color: "grey" }}>로그인 상태 유지</div>
+          </LoginCheckBox>
+          <input type="submit" className="btnLogin" value="로그인" />
+        </LoginForm>
+        <div style={{ fontSize: "15px", color: "grey" }}>────────── 소셜 로그인 ──────────</div>
+        <SocialLogin>
+          <div className='github'><FaGithub /></div>
+          <div className='google'><FcGoogle /></div>
+          <div className='kakao'><RiKakaoTalkFill /></div>
+        </SocialLogin>
+        <Join>
+          <span>아직 계정이 없으신가요?</span>
+          <Link to="/join" className="goToJoin">
+            회원가입
+          </Link>
+        </Join>
+      </LoginBox>
+    </LoginBack>
+  );
 };
 
 export default Login

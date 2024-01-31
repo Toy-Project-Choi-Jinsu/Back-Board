@@ -2,7 +2,7 @@ import React, { useEffect, useRef } from 'react'
 import { useNavigate } from 'react-router-dom';
 import styled from 'styled-components';
 
-const Menu = ({setMenuOpen}) => {
+const Menu = ({ setMenuOpen }) => {
 
   // 모달 외부 클릭 시 끄기
   const menuRef = useRef(null);
@@ -31,24 +31,24 @@ const Menu = ({setMenuOpen}) => {
   });
 
   const nav = useNavigate();
-  const moveMenu = (menu)=>{
-    if(menu != 'logout'){
-        nav(`/${menu}`)
-    }else{
-        localStorage.clear()
-        alert("로그아웃 되었습니다.")
-        nav('/')
+  const moveMenu = (menu) => {
+    if (menu != 'logout') {
+      nav(`/${menu}`)
+    } else {
+      localStorage.clear()
+      alert("로그아웃 되었습니다.")
+      window.location.replace('/');
     }
     setMenuOpen(false);
   }
 
   return (
     <ChangeNickBox ref={menuRef}>
-      <div onClick={()=>moveMenu('blog')}>내 보드</div>
-      <div onClick={()=>moveMenu('tempwrite')}>임시저장</div>
-      <div onClick={()=>moveMenu('read')}>관심 보드</div>
-      <div onClick={()=>moveMenu('mypage')}>마이페이지</div>
-      <div onClick={()=>moveMenu('logout')}>로그아웃</div>
+      <div onClick={() => moveMenu('blog')}>내 보드</div>
+      <div onClick={() => moveMenu('tempwrite')}>임시저장</div>
+      <div onClick={() => moveMenu('read')}>관심 보드</div>
+      <div onClick={() => moveMenu('mypage')}>마이페이지</div>
+      <div onClick={() => moveMenu('logout')}>로그아웃</div>
     </ChangeNickBox>
   )
 }

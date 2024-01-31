@@ -1,14 +1,16 @@
-import React, { useState } from 'react'
+import React, { useContext, useEffect, useState } from 'react'
+import { Link, useLocation } from "react-router-dom";
+import { UserContext } from '../../contexts/UserContext';
+
 import styled from 'styled-components'
 import { FaRegCircleUser } from "react-icons/fa6";
 
-
-import { Link } from "react-router-dom";
 import Menu from './Menu';
 
-const Header = () => {
 
-  const loginData = localStorage.getItem("loginData")
+const Header = () => {
+  const location = useLocation().pathname;
+  const userData = useContext(UserContext);
 
   const [menuOpen, setMenuOpen] = useState(false);
 
@@ -19,39 +21,51 @@ const Header = () => {
 
   return (
     <div>
-        <div style={{height: "90px"}}></div>
-    <HeaderBox>
-      <Link to='/' className='logoBox'>
-        <img src={`${process.env.PUBLIC_URL}/images/BackBoardLogo.png`} alt="웹페이지 로고" />
-      </Link>
-        <div className='menuBox'>
-          {loginData != null ?
-          <Link to='/newwrite'>
-          <div className='newwrite'>보드 작성</div>
+      <div style={{ height: "90px" }}></div>
+      <HeaderBox>
+        {location != "/blog" ?
+          <Link to='/' className='logoBox'>
+            <img src={`${process.env.PUBLIC_URL}/images/BackBoardLogo.png`} alt="웹페이지 로고" />
           </Link>
           :
-          <Link to='/login'>
-          <div className='newwrite'>로그인</div>
-          </Link>}
-          
-          
-            {loginData != null ?
-            <div className='imgBox'>
-              {loginData.user_profile_img != null ?
-              <img src={`${process.env.PUBLIC_URL}/images/user2.png`} alt="유저 사진" onClick={showMenu}/>
-              :
-              <FaRegCircleUser onClick={showMenu}/>
+          <div className='logoBox'>
+            <Link to='/' >
+              <img src={`${process.env.PUBLIC_URL}/images/BBInitialLogo.png`} alt="웹페이지 로고" />
+            </Link>
+            <Link to='/blog' className='myBlog'>
+              {userData?.user_board}
+            </Link>
+          </div>
+        }
+
+        <div className='menuBox'>
+          {userData != null ?
+            <Link to='/newwrite'>
+              <div className='newwrite'>보드 작성</div>
+            </Link>
+            :
+            <Link to='/login'>
+              <div className='newwrite'>로그인</div>
+            </Link>}
+
+
+          {userData != null ?
+            <div className='imgBox' onClick={showMenu}>
+              {userData?.user_profile_img != null ?
+                <img src={userData?.user_profile_img} alt="유저 사진" />
+                :
+                <FaRegCircleUser />
               }
             </div>
             :
             <Link to='/login'>
               <div className='imgBox'>
-            <FaRegCircleUser />
-            </div>
+                <FaRegCircleUser />
+              </div>
             </Link>}
         </div>
         {menuOpen && <Menu setMenuOpen={setMenuOpen} />}
-    </HeaderBox>
+      </HeaderBox>
     </div>
   )
 }
@@ -64,25 +78,37 @@ const HeaderBox = styled.div`
   align-items: center;
   width: 100%;
   height: 90px;
-  background-color: whitesmoke;
   position: fixed;
   top: 0;
+  background-color: white;
+  border-bottom: 1px solid #bdbdbd;
 
   & a{
     text-decoration: none;
   }
 
   & .logoBox{
+    display: flex;
+    align-items: center;
     margin-left: 10%;
+
+    & .myBlog{
+      font-size: 28px;
+      font-weight: bold;
+      margin-left: 10px;
+      text-decoration: none;
+      color: inherit;
+    }
+
     @media screen and (max-width: 1040px) {
     margin-left: 3%;
   }
   }
 
   & img{
-    width: 250px;
+    height: 50px;
     @media screen and (max-width: 1040px) {
-      width: 230px;
+      height: 45px;
   }
   }
   & .menuBox{
@@ -127,7 +153,7 @@ const HeaderBox = styled.div`
     }
 
     & img{
-      max-width: 40px;
+      /* max-width: 40px; */
       max-height: 40px;
     }
   }
