@@ -10,7 +10,6 @@ const BasicInfo = () => {
   const userData = useContext(UserContext);
   // 이미지 변경
   const setImage = async (e) => {
-    console.log(e.target.files[0]);
     const file = e.target.files[0];
     if (file) {
       const formData = new FormData();
@@ -19,23 +18,22 @@ const BasicInfo = () => {
       formData.append('name', userData?.user_email);
 
       try {
+        delete axios.defaults.headers.common["Authorization"];
         const response = await axios.post('https://api.imgbb.com/1/upload', formData);
 
         if (response.data.success) {
           const imageUrl = response.data.data.url;
-          const imageHash = response.data.data.id;
-          axios.post('/mypage/changeImg', { email: userData.user_email, url: imageUrl, hash: imageHash }).then((res) => {
-            if (res.data.chageImgResult) {
+          const accessToken = localStorage.getItem("accessToken");
+          axios.defaults.headers.common["Authorization"] = `Bearer ${accessToken}`
+          axios.post('/mypage/changeImg', { url: imageUrl }).then((res) => {
+            if (res.data.changeImgResult) {
               alert("이미지 변경이 완료되었습니다.")
               userData.user_profile_img = imageUrl
-              userData.user_profile_img_hash = imageHash
-              localStorage.setItem("loginData", JSON.stringify(userData));
               window.location.replace('/mypage')
             } else {
               alert("이미지 업로드 중 오류가 발생했습니다.");
             }
           })
-          console.log("Image URL:", imageUrl);
         } else {
           console.error('Image upload failed:', response.data);
           alert("이미지 업로드 중 오류가 발생했습니다.");
@@ -64,12 +62,11 @@ const BasicInfo = () => {
   }
 
   const changeBasicInfo = () => {
-    axios.post('/mypage/changeBasicInfo', { email: userData.user_email, name: name, intro: intro }).then((res) => {
+    axios.post('/mypage/changeBasicInfo', { name: name, intro: intro }).then((res) => {
       if (res.data.changeBasicInfoResult) {
         alert("기본정보 변경이 완료되었습니다.")
         userData.user_name = name;
         userData.user_intro = intro;
-        localStorage.setItem("loginData", JSON.stringify(userData));
         setChange(!change);
       } else {
         alert("[NETWORK ERROR] 다시 시도해주세요.")

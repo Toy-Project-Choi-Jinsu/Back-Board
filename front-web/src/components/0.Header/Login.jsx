@@ -25,12 +25,12 @@ const Login = () => {
     e.preventDefault();
     try {
       axios.post("/user/login", { email: email, pw: pw }).then((res) => {
-        const loginData = res.data.loginResult;
-        if (typeof loginData == "string") {
+        const accessToken = res.data.loginResult;
+        if (typeof accessToken == "string") {
           alert(`로그인 성공!`);
-          localStorage.setItem("loginData", JSON.stringify(loginData));
+          localStorage.setItem("accessToken", JSON.stringify(accessToken));
           window.location.replace("/");
-        } else if (loginData) {
+        } else if (accessToken) {
           alert("아이디 또는 비밀번호를 확인해주세요!");
         } else {
           alert("[NETWORK ERROR] 다시 시도해주세요.")

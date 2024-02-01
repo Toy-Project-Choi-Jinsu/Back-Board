@@ -1,26 +1,17 @@
 const express = require("express");
-const jwt = require("jsonwebtoken");
-const getJwtAuth = require("./jwtAuth");
+const jwtAuth = require("../controllers/jwtAuth");
 const router = express.Router();
 const pool = require("../config/database");
+const userController = require("../controllers/userController");
 
 // 회원가입 관련 로직
 // 보드명 중복 체크
 router.post("/join/checkDupBoard", async (req, res) => {
   console.log("checkDupBoard", req.body);
-  let { board } = req.body;
-  let checkDupBoardSql = "select * from t_user where user_board = ?";
+  const { board } = req.body;
   try {
-    const [checkDupBoardRows] = await pool.query(checkDupBoardSql, [board]);
-    if (checkDupBoardRows.length == 0) {
-      console.log("Valid Board : ", board);
-      res.json({
-        checkDupBoardResult: board
-      });
-    } else {
-      console.log("Invalid Board : ", board);
-      res.json({ checkDupBoardResult: true });
-    }
+    const isValidBoard = await userController.checkDupBoard(board);
+    res.json({ checkDupBoardResult: isValidBoard ? board : true });
   } catch (err) {
     console.log("[CheckDupBoard ERROR] : ", err);
     res.json({ checkDupBoardResult: false });
@@ -30,19 +21,10 @@ router.post("/join/checkDupBoard", async (req, res) => {
 // 이메일 중복 체크
 router.post("/join/checkDupEmail", async (req, res) => {
   console.log("checkDupEmail", req.body);
-  let { email } = req.body;
-  let checkDupEmailSql = "select * from t_user where user_email = ?";
+  const { email } = req.body;
   try {
-    const [checkDupEmailRows] = await pool.query(checkDupEmailSql, [email]);
-    if (checkDupEmailRows.length == 0) {
-      console.log("Valid Email : ", email);
-      res.json({
-        checkDupEmailResult: email
-      });
-    } else {
-      console.log("Invalid Email : ", email);
-      res.json({ checkDupEmailResult: true });
-    }
+    const isValidEmail = await userController.checkDupEmail(email);
+    res.json({ checkDupEmailResult: isValidEmail ? email : true });
   } catch (err) {
     console.log("[CheckDupEmail ERROR] : ", err);
     res.json({ checkDupEmailResult: false });
@@ -52,11 +34,9 @@ router.post("/join/checkDupEmail", async (req, res) => {
 // 회원가입
 router.post("/join", async (req, res) => {
   console.log("Join", req.body);
-  let { email, pw, name, board, intro } = req.body;
-  let joinSql = `insert into t_user (user_email, user_pw, user_name, user_board, joined_type, user_intro)
-                                 values (?,SHA2(?,384),?,?,'general',?)`;
+  const { email, pw, name, board, intro } = req.body;
   try {
-    await pool.query(joinSql, [email, pw, name, board, intro]);
+    await userController.join(email, pw, name, board, intro);
     console.log("Success Join : ", email);
     res.json({ joinResult: true })
   } catch (err) {
@@ -68,46 +48,37 @@ router.post("/join", async (req, res) => {
 // 로그인
 router.post("/login", async (req, res) => {
   console.log("login", req.body);
-  let { email, pw } = req.body;
-  let loginSql = `select user_email, user_name, user_board, user_profile_img, joined_type, user_intro
-                      from t_user 
-                     where user_email = ?
-                       and user_pw =sha2(?,384)`;
+  const { email, pw } = req.body;
   try {
-    const [loginRows] = await pool.query(loginSql, [email, pw]);
-    if (loginRows.length != 0) {
-      const payload = { user_email: loginRows[0].user_email }
-      const key = process.env.SECRECT_KEY
-      const accessToken = jwt.sign(payload, key, { expiresIn: '15m' })
-      console.log("Success Login : ", email);
-      res.json({ loginResult: accessToken });
-    } else {
-      console.log("Fail Login!");
-      res.json({ loginResult: true });
-    }
+    const isValidLogin = await userController.login(email, pw);
+    const payload = { user_email: email }
+    const accessToken = jwtAuth.signToken(payload, '1h');
+    res.json({ loginResult: isValidLogin ? accessToken : true })
   } catch (err) {
     console.log("[LOGIN ERROR] : ", err);
     res.json({ loginResult: false });
   }
 });
 
-// 유저정보조회
-router.post("/getUserData", async (req, res) => {
-  console.log("getUserData", req.body);
-  const key = process.env.SECRECT_KEY
-  let { accessToken } = req.body;
-  let getUserDataSql = `select user_email, user_name, user_board, user_profile_img, joined_type, user_intro
-                      from t_user 
-                     where user_email = ?`;
+// 탈퇴
+router.post("/delete", jwtAuth.verifyToken, async (req, res) => {
+  console.log("delete");
+  const { pw } = req.body;
   try {
-    const user_email = getJwtAuth(accessToken, key);
-    if (user_email) {
-      const [getUserDataSqlRows] = await pool.query(getUserDataSql, [user_email]);
-      console.log("Success GetUserData : ", user_email);
-      res.json({ getUserDataResult: getUserDataSqlRows[0] })
-    } else {
-      res.json({ getUserDataResult: false })
-    }
+    const isValidPw = await userController.delete(req.token, pw);
+    res.json({ deleteResult: isValidPw ? "Bye!" : true })
+  } catch (err) {
+    console.log("[DELETE ERROR] : ", err);
+    res.json({ deleteResult: false });
+  }
+});
+
+// 유저정보조회
+router.post("/getUserData", jwtAuth.verifyToken, async (req, res) => {
+  console.log("getUserData");
+  try {
+    const userData = await userController.getUserData(req.token);
+    res.json({ getUserDataResult: req.token ? userData : false })
   } catch (err) {
     console.log("[GetUserData ERROR] : ", err);
     res.json({ getUserDataResult: false });

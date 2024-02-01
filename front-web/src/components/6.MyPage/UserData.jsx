@@ -36,7 +36,7 @@ const UserData = () => {
   }
 
   const changeBoard = () => {
-    axios.post('/mypage/changeBoard', { email: userData?.user_email, board: board }).then((res) => {
+    axios.post('/mypage/changeBoard', { board: board }).then((res) => {
       if (res.data.changeBoardResult) {
         alert("보드명 변경이 완료되었습니다.")
         userData.user_board = board;
@@ -48,8 +48,9 @@ const UserData = () => {
   }
 
   const changeEmail = () => {
-    axios.post('/mypage/changeEmail', { oldEmail: userData?.user_email, newEmail: email }).then((res) => {
+    axios.post('/mypage/changeEmail', { email: email }).then((res) => {
       if (res.data.changeEmailResult) {
+        localStorage.setItem("accessToken", JSON.stringify(res.data.newAccessToken));
         alert("이메일 변경이 완료되었습니다.")
         userData.user_email = email;
         setEmailChange(!emailChange);

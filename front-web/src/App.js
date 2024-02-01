@@ -14,19 +14,15 @@ import Join from "./components/0.Header/Join";
 import { useEffect, useState } from "react";
 
 function App() {
-  const accessToken = JSON.parse(localStorage.getItem("loginData"));
+  const accessToken = JSON.parse(localStorage.getItem("accessToken"));
   const [userData, setUserData] = useState(null);
 
   const getUserData = async () => {
     try {
-      const response = await axios.post('/user/getUserData', { accessToken });
+      const response = await axios.post('/user/getUserData');
       const userData = response.data.getUserDataResult;
       if (userData) {
         setUserData(userData);
-      } else {
-        alert("로그인 정보가 만료되었습니다. 다시 로그인 해주세요.")
-        localStorage.clear();
-        window.location.replace('/login');
       }
     } catch (error) {
       console.error("Error fetching user data:", error);

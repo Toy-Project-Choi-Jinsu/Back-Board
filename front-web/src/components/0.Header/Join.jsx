@@ -51,10 +51,10 @@ const Join = () => {
         setPassBoard(true);
         setCheckBoardText("* 사용가능한 보드명 입니다.");
         setPassDupBoard(true);
-      } else if(res.data.checkDupBoardResult) {
+      } else if (res.data.checkDupBoardResult) {
         setPassBoard(false);
         setCheckBoardText("* 중복된 보드명 입니다.");
-      } else{
+      } else {
         alert("[NETWORK ERROR] 다시 시도해주세요.")
       }
     });
@@ -88,10 +88,10 @@ const Join = () => {
         setPassEmail(true);
         setPassDupEmail(true);
         setCheckEmailText("* 사용가능한 이메일 입니다.");
-      } else if(res.data.checkDupEmailResult){
+      } else if (res.data.checkDupEmailResult) {
         setPassEmail(false);
         setCheckEmailText("* 중복된 이메일 입니다.");
-      } else{
+      } else {
         alert("[NETWORK ERROR] 다시 시도해주세요.")
       }
     });
@@ -159,29 +159,23 @@ const Join = () => {
     }
   };
 
-  const join = ()=>{
+  const join = () => {
     axios.post('/user/join',
-    {email: email,
-      pw: pw,
-      name:name,
-      board: board,
-      intro: intro})
-    .then((res) => {
-      if(res.data.joinResult){
-        alert("회원가입이 완료되었습니다.")
-        localStorage.setItem("loginData", JSON.stringify(
-          {user_email: email,
-            user_name:name,
-            user_board: board,
-            user_profile_img: null,
-            joined_type: "general",
-            user_intro: intro
-        }))
-        nav('/')
-      }else{
-        alert("[NETWORK ERROR] 다시 시도해주세요.")
-      }
-    })
+      {
+        email: email,
+        pw: pw,
+        name: name,
+        board: board,
+        intro: intro
+      })
+      .then((res) => {
+        if (res.data.joinResult) {
+          alert("회원가입이 완료되었습니다.")
+          nav('/login')
+        } else {
+          alert("[NETWORK ERROR] 다시 시도해주세요.")
+        }
+      })
 
   }
 
@@ -192,163 +186,163 @@ const Join = () => {
           <img src={`${process.env.PUBLIC_URL}/images/BackBoardLogo.png`} alt="백보드 로고" />
         </Link>
         <LoginDataBox>
-      <LoginDataInput>
-        <Title>
-          환영합니다! 기본 회원 정보를 입력해주세요.
-        </Title>
-        <Input>
-          <CheckBox>
+          <LoginDataInput>
+            <Title>
+              환영합니다! 기본 회원 정보를 입력해주세요.
+            </Title>
+            <Input>
+              <CheckBox>
                 {passName ? (
                   <AiOutlineCheckCircle className="pass" />
                 ) : (
                   <RiCheckboxBlankCircleLine className="init" />
                 )}
-          </CheckBox>
-          <input
-            className="normalInput"
-            type="text"
-            placeholder="이름"
-            value={name}
-            onChange={(e) => {
-              setName(e.target.value);
-            }}
-          />
-        </Input>
-        <Warning></Warning>
-        <Input>
-          <CheckBox>
-            {passBoard == null ? (
-              <RiCheckboxBlankCircleLine className="init" />
-            ) : (
-              <>
-                {passBoard ? (
-                  <AiOutlineCheckCircle className="pass" />
+              </CheckBox>
+              <input
+                className="normalInput"
+                type="text"
+                placeholder="이름"
+                value={name}
+                onChange={(e) => {
+                  setName(e.target.value);
+                }}
+              />
+            </Input>
+            <Warning></Warning>
+            <Input>
+              <CheckBox>
+                {passBoard == null ? (
+                  <RiCheckboxBlankCircleLine className="init" />
                 ) : (
-                  <AiOutlineCloseCircle className="warn" />
+                  <>
+                    {passBoard ? (
+                      <AiOutlineCheckCircle className="pass" />
+                    ) : (
+                      <AiOutlineCloseCircle className="warn" />
+                    )}
+                  </>
                 )}
-              </>
-            )}
-          </CheckBox>
-          <input
-            className="dupCheckInput"
-            type="text"
-            placeholder="보드명 (2~6글자)"
-            value={board}
-            onChange={(e) => {
-              setBoard(e.target.value);
-            }}
-          />
-          <DupCheckBox onClick={checkDupBoard}>중복확인</DupCheckBox>
-        </Input>
-        {passBoard ? (
-          <Passed>{checkBoardText}</Passed>
-        ) : (
-          <Warning>{checkBoardText}</Warning>
-        )}
-        <Input>
-          <CheckBox>
-            {passEmail == null ? (
-              <RiCheckboxBlankCircleLine className="init" />
+              </CheckBox>
+              <input
+                className="dupCheckInput"
+                type="text"
+                placeholder="보드명 (2~6글자)"
+                value={board}
+                onChange={(e) => {
+                  setBoard(e.target.value);
+                }}
+              />
+              <DupCheckBox onClick={checkDupBoard}>중복확인</DupCheckBox>
+            </Input>
+            {passBoard ? (
+              <Passed>{checkBoardText}</Passed>
             ) : (
-              <>
-                {passEmail ? (
-                  <AiOutlineCheckCircle className="pass" />
-                ) : (
-                  <AiOutlineCloseCircle className="warn" />
-                )}
-              </>
+              <Warning>{checkBoardText}</Warning>
             )}
-          </CheckBox>
-          <input
-            className="dupCheckInput"
-            type="text"
-            placeholder="이메일 (example@gmail.com)"
-            value={email}
-            onChange={(e) => {
-              setEmail(e.target.value);
-            }}
-          />
-          <DupCheckBox onClick={checkDupEmail}>중복확인</DupCheckBox>
-        </Input>
-        {passEmail ? (
-          <Passed>{checkEmailText}</Passed>
-        ) : (
-          <Warning>{checkEmailText}</Warning>
-        )}
+            <Input>
+              <CheckBox>
+                {passEmail == null ? (
+                  <RiCheckboxBlankCircleLine className="init" />
+                ) : (
+                  <>
+                    {passEmail ? (
+                      <AiOutlineCheckCircle className="pass" />
+                    ) : (
+                      <AiOutlineCloseCircle className="warn" />
+                    )}
+                  </>
+                )}
+              </CheckBox>
+              <input
+                className="dupCheckInput"
+                type="text"
+                placeholder="이메일 (example@gmail.com)"
+                value={email}
+                onChange={(e) => {
+                  setEmail(e.target.value);
+                }}
+              />
+              <DupCheckBox onClick={checkDupEmail}>중복확인</DupCheckBox>
+            </Input>
+            {passEmail ? (
+              <Passed>{checkEmailText}</Passed>
+            ) : (
+              <Warning>{checkEmailText}</Warning>
+            )}
 
-        <Input>
-          <CheckBox>
-            {passPW == null ? (
-              <RiCheckboxBlankCircleLine className="init" />
-            ) : (
-              <>
-                {passPW ? (
-                  <AiOutlineCheckCircle className="pass" />
+            <Input>
+              <CheckBox>
+                {passPW == null ? (
+                  <RiCheckboxBlankCircleLine className="init" />
                 ) : (
-                  <AiOutlineCloseCircle className="warn" />
+                  <>
+                    {passPW ? (
+                      <AiOutlineCheckCircle className="pass" />
+                    ) : (
+                      <AiOutlineCloseCircle className="warn" />
+                    )}
+                  </>
                 )}
-              </>
-            )}
-          </CheckBox>
-          <input
-            className="normalInput"
-            type="password"
-            placeholder="비밀번호 (8자리 이상) "
-            value={pw}
-            onChange={(e) => {
-              setPw(e.target.value);
-            }}
-          />
-        </Input>
+              </CheckBox>
+              <input
+                className="normalInput"
+                type="password"
+                placeholder="비밀번호 (8자리 이상) "
+                value={pw}
+                onChange={(e) => {
+                  setPw(e.target.value);
+                }}
+              />
+            </Input>
 
-        <Warning>{checkPWText}</Warning>
-        <Input>
-          <CheckBox>
-            {passRePW == null ? (
-              <RiCheckboxBlankCircleLine className="init" />
-            ) : (
-              <>
-                {passRePW ? (
-                  <AiOutlineCheckCircle className="pass" />
+            <Warning>{checkPWText}</Warning>
+            <Input>
+              <CheckBox>
+                {passRePW == null ? (
+                  <RiCheckboxBlankCircleLine className="init" />
                 ) : (
-                  <AiOutlineCloseCircle className="warn" />
+                  <>
+                    {passRePW ? (
+                      <AiOutlineCheckCircle className="pass" />
+                    ) : (
+                      <AiOutlineCloseCircle className="warn" />
+                    )}
+                  </>
                 )}
-              </>
-            )}
-          </CheckBox>
-          <input
-            className="normalInput"
-            type="password"
-            placeholder="비밀번호 확인"
-            value={rePw}
-            onChange={(e) => {
-              setRePw(e.target.value);
-            }}
-          />
-        </Input>
-        <Warning>{checkRePWText}</Warning>
-        <Input>
-          <CheckBox>
+              </CheckBox>
+              <input
+                className="normalInput"
+                type="password"
+                placeholder="비밀번호 확인"
+                value={rePw}
+                onChange={(e) => {
+                  setRePw(e.target.value);
+                }}
+              />
+            </Input>
+            <Warning>{checkRePWText}</Warning>
+            <Input>
+              <CheckBox>
                 {passIntro ? (
                   <AiOutlineCheckCircle className="pass" />
                 ) : (
                   <RiCheckboxBlankCircleLine className="init" />
                 )}
-          </CheckBox>
-          <input
-            className="normalInput"
-            type="text"
-            placeholder="한줄 소개(공백입력 가능)"
-            value={intro}
-            onChange={(e) => {
-              setIntro(e.target.value);
-            }}
-          />
-        </Input>
-        <Warning></Warning>
-      </LoginDataInput>
-      <button onClick={checkUserInput}>회원 가입</button>
-    </LoginDataBox>
+              </CheckBox>
+              <input
+                className="normalInput"
+                type="text"
+                placeholder="한줄 소개(공백입력 가능)"
+                value={intro}
+                onChange={(e) => {
+                  setIntro(e.target.value);
+                }}
+              />
+            </Input>
+            <Warning></Warning>
+          </LoginDataInput>
+          <button onClick={checkUserInput}>회원 가입</button>
+        </LoginDataBox>
       </JoinBox>
     </JoinBack>
   )
