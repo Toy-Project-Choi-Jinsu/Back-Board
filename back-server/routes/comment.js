@@ -1,5 +1,5 @@
 const express = require("express");
 const router = express.Router();
-const pool = require("../config/database");
+const jwtAuth = require("../controllers/jwtAuth");
 
 module.exports = router;

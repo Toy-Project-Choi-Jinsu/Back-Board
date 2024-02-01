@@ -1,7 +1,6 @@
 const express = require("express");
 const jwtAuth = require("../controllers/jwtAuth");
 const router = express.Router();
-const pool = require("../config/database");
 const userController = require("../controllers/userController");
 
 // 회원가입 관련 로직

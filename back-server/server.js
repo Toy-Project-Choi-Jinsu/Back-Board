@@ -1,6 +1,7 @@
 const express = require("express");
 const app = express();
 const bodyParser = require("body-parser");
+const indexRouter = require("./routes/index");
 const userRouter = require("./routes/user");
 const mypageRouter = require("./routes/mypage");
 const boardRouter = require("./routes/board");
@@ -13,6 +14,7 @@ app.use(cors());
 dotenv.config();
 app.use(express.json());
 app.set("port", process.env.PORT || 5555);
+app.use("/", indexRouter);
 app.use("/user", userRouter);
 app.use("/mypage", mypageRouter);
 app.use("/board", boardRouter);

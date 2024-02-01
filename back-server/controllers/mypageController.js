@@ -1,5 +1,4 @@
 const db = require("./db");
-const jwtAuth = require("./jwtAuth");
 
 module.exports = {
     changeImg: async (url, token) => {
