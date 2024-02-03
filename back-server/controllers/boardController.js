@@ -11,4 +11,13 @@ module.exports = {
             throw error;
         }
     },
+
+    getThisBoardList: async (thisBoard) => {
+        const sql = `select * from t_board where user_board = ?`;
+        try {
+            return await db.query(sql, [thisBoard]);
+        } catch (error) {
+            throw error;
+        }
+    },
 }

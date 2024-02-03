@@ -68,20 +68,21 @@ const ChangeNickBox = styled.div`
   position: fixed;
   top: 80px;
   right: 10%;
-  background-color: #950AFF0f;;
+  background-color: rgb(201, 131, 255);;
   border-radius: 5px;
 
   & div{
     display: flex;
     align-items: center;
     font-size: 18px;
+    color: white;
     width: 150px;
     height: 45px;
     padding-left: 30px;
     cursor: pointer;
     &:hover {
       background-color: #2e22880f;
-      color: #950AFF;
+      color: #9000ff;
     }
   }
 

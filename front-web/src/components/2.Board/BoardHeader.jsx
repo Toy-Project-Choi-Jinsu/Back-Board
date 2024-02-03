@@ -19,7 +19,6 @@ const BoardHeader = () => {
       const response = await axios.post('/board/getThisBoardData', { thisBoard: thisBoard });
       const thisBoardData = response.data.getThisBoardDataResult;
       if (thisBoardData) {
-        console.log(thisBoardData);
         setThisBoardData(thisBoardData);
       } else {
         window.location.replace(location)
