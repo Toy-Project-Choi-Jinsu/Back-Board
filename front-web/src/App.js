@@ -4,7 +4,7 @@ import axios from "./axios";
 
 import Header from "./components/0.Header/Header";
 import Main from "./components/1.Main/Main";
-import Blog from "./components/2.Blog/Blog";
+import Board from "./components/2.Board/Board";
 import TempWrite from "./components/3.TempWrite/TempWrite";
 import NewWrite from "./components/4.NewWrite/NewWrite";
 import Read from "./components/5.Read/Read";
@@ -12,6 +12,10 @@ import MyPage from "./components/6.MyPage/MyPage";
 import Login from "./components/0.Header/Login";
 import Join from "./components/0.Header/Join";
 import { useEffect, useState } from "react";
+import BoardDetail from "./components/2.Board/BoardDetail";
+import BoardList from "./components/2.Board/BoardList";
+import BoardSeries from "./components/2.Board/BoardSeries";
+import BoardIntro from "./components/2.Board/BoardIntro";
 
 function App() {
   const accessToken = JSON.parse(localStorage.getItem("accessToken"));
@@ -44,7 +48,12 @@ function App() {
           <Route path="/" element={<Main />}></Route>
           <Route path="/login" element={<Login />}></Route>
           <Route path="/join" element={<Join />}></Route>
-          <Route path="/blog" element={<Blog />}></Route>
+          <Route path="/:user_board" element={<Board />}>
+            <Route path="/:user_board/list" element={<BoardList />}></Route>
+            <Route path="/:user_board/series" element={<BoardSeries />}></Route>
+            <Route path="/:user_board/intro" element={<BoardIntro />}></Route>
+            <Route path="/:user_board/:bd_title" element={<BoardDetail />}></Route>
+          </Route>
           <Route path="/tempwrite" element={<TempWrite />}></Route>
           <Route path="/newwrite" element={<NewWrite />}></Route>
           <Route path="/read" element={<Read />}></Route>

@@ -1,8 +1,10 @@
-import React, { useEffect, useRef } from 'react'
+import React, { useContext, useEffect, useRef } from 'react'
 import { useNavigate } from 'react-router-dom';
 import styled from 'styled-components';
+import { UserContext } from '../../contexts/UserContext';
 
 const Menu = ({ setMenuOpen }) => {
+  const userData = useContext(UserContext);
 
   // 모달 외부 클릭 시 끄기
   const menuRef = useRef(null);
@@ -44,7 +46,7 @@ const Menu = ({ setMenuOpen }) => {
 
   return (
     <ChangeNickBox ref={menuRef}>
-      <div onClick={() => moveMenu('blog')}>내 보드</div>
+      <div onClick={() => moveMenu(`@${userData.user_board}/list`)}>내 보드</div>
       <div onClick={() => moveMenu('tempwrite')}>임시저장</div>
       <div onClick={() => moveMenu('read')}>관심 보드</div>
       <div onClick={() => moveMenu('mypage')}>마이페이지</div>

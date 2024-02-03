@@ -10,8 +10,8 @@ import Menu from './Menu';
 
 const Header = () => {
   const location = useLocation().pathname;
+  const user_board = decodeURIComponent(location.split("/")[1].substring(1))
   const userData = useContext(UserContext);
-
   const [menuOpen, setMenuOpen] = useState(false);
 
   // 모달창 노출
@@ -23,7 +23,7 @@ const Header = () => {
     <div>
       <div style={{ height: "90px" }}></div>
       <HeaderBox>
-        {location != "/blog" ?
+        {!location.includes("@") ?
           <Link to='/' className='logoBox'>
             <img src={`${process.env.PUBLIC_URL}/images/BackBoardLogo.png`} alt="웹페이지 로고" />
           </Link>
@@ -32,8 +32,8 @@ const Header = () => {
             <Link to='/' >
               <img src={`${process.env.PUBLIC_URL}/images/BBInitialLogo.png`} alt="웹페이지 로고" />
             </Link>
-            <Link to='/blog' className='myBlog'>
-              {userData?.user_board}
+            <Link to={`/@${user_board}/list`} className='myBlog'>
+              {user_board}
             </Link>
           </div>
         }
@@ -51,11 +51,7 @@ const Header = () => {
 
           {userData != null ?
             <div className='imgBox' onClick={showMenu}>
-              {userData?.user_profile_img != null ?
-                <img src={userData?.user_profile_img} alt="유저 사진" />
-                :
-                <FaRegCircleUser />
-              }
+              <img src={userData?.user_profile_img} alt="유저 사진" />
             </div>
             :
             <Link to='/login'>

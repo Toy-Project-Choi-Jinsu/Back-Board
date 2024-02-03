@@ -1,16 +1,19 @@
 import React from 'react'
 import styled from 'styled-components'
+import { Link } from 'react-router-dom'
 
 const MainGrid = ({ data }) => {
     return (
-        <Content>
-            <div className='titleImg'>
-                <img src={`${process.env.PUBLIC_URL}/images/BBInitialLogo.png`} alt="sss" />
-            </div>
-            <div className='title'>{data.bd_title}</div>
-            <div className='content'>{data.bd_content}</div>
-            <div className='created_at'>{data.bd_created_at}</div>
-        </Content>
+        <Link to={`/@${data.user_board}/${data.bd_title}`}>
+            <Content>
+                <div className='titleImg'>
+                    <img src={data.bd_title_img} alt="sss" />
+                </div>
+                <div className='title'>{data.bd_title}</div>
+                <div className='content'>{data.bd_content}</div>
+                <div className='created_at'>{data.bd_created_at}</div>
+            </Content>
+        </Link>
     )
 }
 

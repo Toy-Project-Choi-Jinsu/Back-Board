@@ -78,14 +78,7 @@ const BasicInfo = () => {
     <BasicInfoBox>
       <ImageBox>
         <Img>
-          {userData?.user_profile_img != null ? (
-            <img src={userData.user_profile_img} alt="유저사진" />
-          ) : (
-            <img
-              src={`${process.env.PUBLIC_URL}/images/User2.png`}
-              alt="기본 유저사진"
-            />
-          )}
+          <img src={userData.user_profile_img} alt="유저사진" />
         </Img>
         <label htmlFor="file">
           <VscEdit />
