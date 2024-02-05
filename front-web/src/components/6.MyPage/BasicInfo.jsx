@@ -78,7 +78,7 @@ const BasicInfo = () => {
     <BasicInfoBox>
       <ImageBox>
         <Img>
-          <img src={userData.user_profile_img} alt="유저사진" />
+          <img src={userData?.user_profile_img} alt="유저사진" />
         </Img>
         <label htmlFor="file">
           <VscEdit />
@@ -216,7 +216,9 @@ const Img = styled.div`
   overflow: hidden;
 
   & img {
-    max-width: 200px;
-    max-height: 200px;
+    width: 200px;
+    height: 200px;
+    object-fit: cover;
+    object-position: center;
   }
 `;

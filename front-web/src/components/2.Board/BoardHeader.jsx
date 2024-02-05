@@ -14,6 +14,10 @@ const BoardHeader = () => {
   const { user_board } = useParams();
   const thisBoard = decodeURIComponent(user_board.substring(1));
 
+  const [followState, setFollowState] = useState(false)
+  const [follower, setFollower] = useState("0")
+  const [following, setFollowing] = useState("0")
+
   const getThisBoardData = async () => {
     try {
       const response = await axios.post('/board/getThisBoardData', { thisBoard: thisBoard });
@@ -28,9 +32,79 @@ const BoardHeader = () => {
     }
   }
 
+  const getFollowState = async () => {
+    try {
+      const response = await axios.post('/board/getFollowState', { thisBoard: thisBoard, loginBoard: loginUserData?.user_board });
+      const followState = response.data.followState;
+      if (followState == undefined) {
+        window.location.replace(location)
+      } else {
+        setFollowState(followState);
+      }
+
+    } catch (error) {
+      window.location.replace(location)
+      console.error("Error fetching main data:", error);
+    }
+  }
+
+  const getFollowNumber = async () => {
+    try {
+      const response = await axios.post('/board/getFollowNumber', { thisBoard: thisBoard });
+      const followNumber = response.data.followNumber;
+      if (followNumber) {
+
+      }
+    } catch (error) {
+      window.location.replace(location)
+      console.error("Error fetching main data:", error);
+    }
+  }
+
   useEffect(() => {
     getThisBoardData();
+    getFollowState();
   }, [])
+
+  const follow = async () => {
+    if (followState) {
+      unFollowingBoard();
+    } else {
+      followingBoard();
+    }
+  }
+
+  const followingBoard = async () => {
+    try {
+      const response = await axios.post('/board/followingBoard', { thisBoard: thisBoard, loginBoard: loginUserData?.user_board });
+      const followingBoardResult = response.data.followingBoardResult;
+      if (followingBoardResult) {
+        setFollowState(followingBoardResult);
+      } else {
+        window.location.replace(location)
+      }
+
+    } catch (error) {
+      window.location.replace(location)
+      console.error("Error fetching main data:", error);
+    }
+  }
+
+  const unFollowingBoard = async () => {
+    try {
+      const response = await axios.post('/board/unFollowingBoard', { thisBoard: thisBoard, loginBoard: loginUserData?.user_board });
+      const unFollowingBoardResult = response.data.unFollowingBoardResult;
+      if (!unFollowingBoardResult) {
+        setFollowState(unFollowingBoardResult);
+      } else {
+        window.location.replace(location)
+      }
+
+    } catch (error) {
+      window.location.replace(location)
+      console.error("Error fetching main data:", error);
+    }
+  }
 
   return (
     <BoardHeaderBox>
@@ -46,15 +120,19 @@ const BoardHeader = () => {
         </IntroBox>
       </ProfileBox>
       <FollowBox>
-        <div className="follower">0 팔로워</div>
-        <div className="following">0 팔로잉</div>
+        <div className="follower">{`${follower} 팔로워`}</div>
+        <div className="following">{`${following} 팔로잉`}</div>
       </FollowBox>
       <ContectBox>
         <div className="contect">
           <div className='github'><FaGithub /></div>
           <div className='google'><FcGoogle /></div>
         </div>
-        {user_board != ("@" + loginUserData?.user_board) ? <div className="followBtn">팔로우</div> : <></>}
+        {user_board != ("@" + loginUserData?.user_board) ?
+          <div className={followState ? "followBtn true" : "followBtn false"}
+            onClick={follow}>
+            {followState ? "" : "팔로우"}
+          </div> : <></>}
       </ContectBox>
       <BoardMenuBox color={location.split("/")[2]}>
         <Link to={`/${user_board}/list`}>
@@ -88,6 +166,7 @@ const ProfileBox = styled.div`
   margin-bottom: 30px;
   padding-bottom: 30px;
   border-bottom: 1px solid #bdbdbd;
+  gap: 30px;
   @media screen and (max-width: 1040px) {
     flex-direction: column;
     width: 100%;
@@ -112,8 +191,10 @@ const Img = styled.div`
   overflow: hidden;
 
   & img {
-    max-width: 200px;
-    max-height: 200px;
+    width: 200px;
+    height: 200px;
+    object-fit: cover;
+    object-position: center;
   }
 `;
 
@@ -210,9 +291,6 @@ gap: 15px;
     justify-content: center;
     align-items: center;
     font-weight: bold;
-    border: 2px solid #950AFF;
-    color: #950AFF;
-    background-color: white;
     width: fit-content;
     height: 30px;
     border-radius: 20px;
@@ -220,7 +298,32 @@ gap: 15px;
     cursor: pointer;
 }
 
-& .followBtn:hover{
+& .true{
+    border: 2px solid #950AFF;
+    color: white;
+    background-color: #950AFF;
+
+    &::before{
+      content: "팔로잉";
+    }
+}
+
+& .false{
+    border: 2px solid #950AFF;
+    color: #950AFF;
+    background-color: white;
+}
+
+& .true:hover{
+  border-color: #ff5959;
+  color: white;
+  background-color: #ff5959;
+  &::before{
+      content: "언팔로우";
+    }
+}
+
+& .false:hover{
   color: white;
   background-color: #950AFF;
 }

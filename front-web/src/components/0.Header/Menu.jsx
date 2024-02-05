@@ -35,7 +35,7 @@ const Menu = ({ setMenuOpen }) => {
   const nav = useNavigate();
   const moveMenu = (menu) => {
     if (menu != 'logout') {
-      nav(`/${menu}`)
+      window.location.replace(`/${menu}`)
     } else {
       localStorage.clear()
       alert("로그아웃 되었습니다.")

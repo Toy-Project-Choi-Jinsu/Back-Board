@@ -222,6 +222,8 @@ border: 1px solid black;
         overflow: hidden;
             & img{
             width: 100%;
+            object-fit: cover;
+            object-position:center;
             }
         }
         & .title{
