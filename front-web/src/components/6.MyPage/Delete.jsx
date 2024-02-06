@@ -28,6 +28,7 @@ const Delete = () => {
           window.location.replace("/");
         } else if (res.data.deleteResult) {
           alert("잘못된 비밀번호입니다.");
+          setDeleteInput(!deleteInput);
         } else {
           alert("[NETWORK ERROR] 다시 시도해주세요.")
         }

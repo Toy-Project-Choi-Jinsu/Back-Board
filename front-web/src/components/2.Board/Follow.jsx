@@ -74,19 +74,73 @@ const Follow = () => {
         window.location.replace(`/@${loginBoard}/list`)
     }
 
+    const goToBoard = (board) => {
+        window.location.replace(`/@${board}/list`)
+    }
+
+    // 재사용 리팩토링 하기
+    const follow = (result, board) => {
+        if (result) {
+            unFollowingBoard(board);
+        } else {
+            followingBoard(board);
+        }
+    }
+
+    const followingBoard = async (board) => {
+        try {
+            const response = await axios.post('/board/followingBoard', { thisBoard: board, loginBoard: loginBoard });
+            const followingBoardResult = response.data.followingBoardResult;
+            if (followingBoardResult) {
+                setLoginUserFollowingList([...loginUserFollowingList, board])
+            } else {
+                window.location.replace(location)
+            }
+
+        } catch (error) {
+            window.location.replace(location)
+            console.error("Error fetching main data:", error);
+        }
+    }
+
+    const unFollowingBoard = async (board) => {
+        try {
+            const response = await axios.post('/board/unFollowingBoard', { thisBoard: board, loginBoard: loginBoard });
+            const unFollowingBoardResult = response.data.unFollowingBoardResult;
+            if (!unFollowingBoardResult) {
+                const indexToRemoveLogin = loginUserFollowingList.indexOf(board);
+                const updatedFollowingList = [...loginUserFollowingList];
+                updatedFollowingList.splice(indexToRemoveLogin, 1);
+                setLoginUserFollowingList(updatedFollowingList)
+                if (loginBoard == thisBoard) {
+                    const indexToRemoveThis = followList.indexOf(board);
+                    const updatedFollowList = [...followList];
+                    updatedFollowList.splice(indexToRemoveThis, 1);
+                    setFollowList(updatedFollowList)
+                }
+            } else {
+                window.location.replace(location)
+            }
+
+        } catch (error) {
+            window.location.replace(location)
+            console.error("Error fetching main data:", error);
+        }
+    }
+
     return (
         <FollowBox>
             {type === "followers" ? <div className='title'>팔로워</div> : <div className='title'>팔로잉</div>}
-            {followList.map((follow) => {
+            {followList.map((board) => {
                 return (
-                    <FollowList key={follow}>
-                        <div className="name">
-                            {follow}
+                    <FollowList key={board}>
+                        <div className="name" onClick={() => goToBoard(board)}>
+                            {board}
                         </div>
-                        {follow != (loginBoard) ?
-                            <div className={loginUserFollowingList.includes(follow) ? "followBtn true" : "followBtn false"}
-                            >
-                                {loginUserFollowingList.includes(follow) ? "" : "팔로우"}
+                        {board != (loginBoard) ?
+                            <div className={loginUserFollowingList.includes(board) ? "followBtn true" : "followBtn false"}
+                                onClick={() => follow(loginUserFollowingList.includes(board), board)}>
+                                {loginUserFollowingList.includes(board) ? "" : "팔로우"}
                             </div> : <div className='followBtn loginBoard' onClick={goToMyBoard}>내 보드</div>}
                     </FollowList>
                 )
@@ -120,6 +174,7 @@ margin: 10px 0 10px 0;
 & .name{
     font-size: 25px;
     font-weight: bold;
+    cursor: pointer;
 }
 
 & .followBtn{

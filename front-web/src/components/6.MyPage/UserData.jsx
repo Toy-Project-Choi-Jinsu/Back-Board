@@ -11,6 +11,11 @@ const UserData = () => {
   const [boardChange, setBoardChange] = useState(false)
   const [emailChange, setEmailChange] = useState(false)
 
+  useEffect(() => {
+    setBoard(userData?.user_board)
+    setEmail(userData?.user_email)
+  }, [userData])
+
   const showBoardInput = () => {
     if (boardChange) {
       if (userData?.user_board == board) {

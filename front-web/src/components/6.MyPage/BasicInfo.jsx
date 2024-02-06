@@ -48,6 +48,10 @@ const BasicInfo = () => {
   const [change, setChange] = useState(false)
   const [name, setName] = useState(userData?.user_name)
   const [intro, setIntro] = useState(userData?.user_intro)
+  useEffect(() => {
+    setName(userData?.user_name)
+    setIntro(userData?.user_intro)
+  }, [userData])
   const showInput = () => {
     if (change) {
       if (name == userData?.user_name && intro == userData?.user_intro) {

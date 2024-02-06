@@ -76,15 +76,15 @@ const BoardHeader = () => {
     nav(`/@${thisBoard}/${type}`, { state: { thisBoard: thisBoard, loginBoard: loginUserData?.user_board } });
   }
 
-  const follow = async (thisBoard, loginBoard) => {
+  const follow = () => {
     if (followState) {
-      unFollowingBoard(thisBoard, loginBoard);
+      unFollowingBoard();
     } else {
-      followingBoard(thisBoard, loginBoard);
+      followingBoard();
     }
   }
 
-  const followingBoard = async (thisBoard, loginBoard) => {
+  const followingBoard = async () => {
     try {
       const response = await axios.post('/board/followingBoard', { thisBoard: thisBoard, loginBoard: loginBoard });
       const followingBoardResult = response.data.followingBoardResult;
@@ -101,7 +101,7 @@ const BoardHeader = () => {
     }
   }
 
-  const unFollowingBoard = async (thisBoard, loginBoard) => {
+  const unFollowingBoard = async () => {
     try {
       const response = await axios.post('/board/unFollowingBoard', { thisBoard: thisBoard, loginBoard: loginBoard });
       const unFollowingBoardResult = response.data.unFollowingBoardResult;
@@ -142,7 +142,7 @@ const BoardHeader = () => {
         </div>
         {user_board != ("@" + loginUserData?.user_board) ?
           <div className={followState ? "followBtn true" : "followBtn false"}
-            onClick={() => follow(thisBoard, loginUserData?.user_board)}>
+            onClick={() => follow()}>
             {followState ? "" : "팔로우"}
           </div> : <></>}
       </ContectBox>
