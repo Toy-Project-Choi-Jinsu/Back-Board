@@ -28,6 +28,48 @@ module.exports = {
         }
     },
 
+    getFollowNumber: async (thisBoard) => {
+        const sql = `SELECT follower.count AS follower,
+                            following.count AS following
+                       FROM (SELECT COUNT(*) AS count
+                               FROM t_follow
+                              WHERE fw_is_followed = ?) AS follower
+                 INNER JOIN (SELECT COUNT(*) AS count
+                               FROM t_follow
+                              WHERE fw_is_following = ?) AS following`
+        try {
+            const followerNumber = await db.query(sql, [thisBoard, thisBoard]);
+            return followerNumber[0];
+        } catch (error) {
+            throw error;
+        }
+    },
+
+    getFollowerList: async (thisBoard) => {
+        const sql = `SELECT JSON_ARRAYAGG(fw_is_following) AS list
+                       FROM t_follow
+                      WHERE fw_is_followed = ?`
+        try {
+            const follower = await db.query(sql, [thisBoard]);
+            console.log(follower);
+            return follower[0].list;
+        } catch (error) {
+            throw error;
+        }
+    },
+
+    getFollowingList: async (thisBoard) => {
+        const sql = `SELECT JSON_ARRAYAGG(fw_is_followed) AS list
+                       FROM t_follow
+                      WHERE fw_is_following = ?`
+        try {
+            const following = await db.query(sql, [thisBoard]);
+            return following[0].list;
+        } catch (error) {
+            throw error;
+        }
+    },
+
     followingBoard: async (thisBoard, loginBoard) => {
         const sql = `insert into t_follow (fw_is_following, fw_is_followed) values (?,?)`;
         try {

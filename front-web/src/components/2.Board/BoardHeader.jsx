@@ -1,5 +1,5 @@
 import React, { useContext, useEffect, useState } from 'react'
-import { Link, useLocation, useParams } from 'react-router-dom'
+import { Link, useLocation, useNavigate, useParams } from 'react-router-dom'
 import { UserContext } from '../../contexts/UserContext';
 import axios from '../../axios';
 
@@ -8,15 +8,17 @@ import { FaGithub } from "react-icons/fa";
 import { FcGoogle } from "react-icons/fc";
 
 const BoardHeader = () => {
+  const nav = useNavigate();
   const [thisBoardData, setThisBoardData] = useState([]);
   const loginUserData = useContext(UserContext);
   const location = useLocation().pathname;
   const { user_board } = useParams();
   const thisBoard = decodeURIComponent(user_board.substring(1));
+  const loginBoard = loginUserData?.user_board;
 
   const [followState, setFollowState] = useState(false)
-  const [follower, setFollower] = useState("0")
-  const [following, setFollowing] = useState("0")
+  const [follower, setFollower] = useState(0)
+  const [following, setFollowing] = useState(0)
 
   const getThisBoardData = async () => {
     try {
@@ -34,7 +36,7 @@ const BoardHeader = () => {
 
   const getFollowState = async () => {
     try {
-      const response = await axios.post('/board/getFollowState', { thisBoard: thisBoard, loginBoard: loginUserData?.user_board });
+      const response = await axios.post('/board/getFollowState', { thisBoard: thisBoard, loginBoard: loginBoard });
       const followState = response.data.followState;
       if (followState == undefined) {
         window.location.replace(location)
@@ -53,7 +55,10 @@ const BoardHeader = () => {
       const response = await axios.post('/board/getFollowNumber', { thisBoard: thisBoard });
       const followNumber = response.data.followNumber;
       if (followNumber) {
-
+        setFollower(followNumber.follower);
+        setFollowing(followNumber.following);
+      } else {
+        throw Error
       }
     } catch (error) {
       window.location.replace(location)
@@ -64,22 +69,28 @@ const BoardHeader = () => {
   useEffect(() => {
     getThisBoardData();
     getFollowState();
-  }, [])
+    getFollowNumber();
+  }, [loginBoard])
 
-  const follow = async () => {
+  const showFollower = (type) => {
+    nav(`/@${thisBoard}/${type}`, { state: { thisBoard: thisBoard, loginBoard: loginUserData?.user_board } });
+  }
+
+  const follow = async (thisBoard, loginBoard) => {
     if (followState) {
-      unFollowingBoard();
+      unFollowingBoard(thisBoard, loginBoard);
     } else {
-      followingBoard();
+      followingBoard(thisBoard, loginBoard);
     }
   }
 
-  const followingBoard = async () => {
+  const followingBoard = async (thisBoard, loginBoard) => {
     try {
-      const response = await axios.post('/board/followingBoard', { thisBoard: thisBoard, loginBoard: loginUserData?.user_board });
+      const response = await axios.post('/board/followingBoard', { thisBoard: thisBoard, loginBoard: loginBoard });
       const followingBoardResult = response.data.followingBoardResult;
       if (followingBoardResult) {
         setFollowState(followingBoardResult);
+        setFollower(follower + 1);
       } else {
         window.location.replace(location)
       }
@@ -90,12 +101,13 @@ const BoardHeader = () => {
     }
   }
 
-  const unFollowingBoard = async () => {
+  const unFollowingBoard = async (thisBoard, loginBoard) => {
     try {
-      const response = await axios.post('/board/unFollowingBoard', { thisBoard: thisBoard, loginBoard: loginUserData?.user_board });
+      const response = await axios.post('/board/unFollowingBoard', { thisBoard: thisBoard, loginBoard: loginBoard });
       const unFollowingBoardResult = response.data.unFollowingBoardResult;
       if (!unFollowingBoardResult) {
         setFollowState(unFollowingBoardResult);
+        setFollower(follower - 1);
       } else {
         window.location.replace(location)
       }
@@ -120,8 +132,8 @@ const BoardHeader = () => {
         </IntroBox>
       </ProfileBox>
       <FollowBox>
-        <div className="follower">{`${follower} 팔로워`}</div>
-        <div className="following">{`${following} 팔로잉`}</div>
+        <div className="follower" onClick={() => showFollower("followers")}>{`${follower} 팔로워`}</div>
+        <div className="following" onClick={() => showFollower("followings")}>{`${following} 팔로잉`}</div>
       </FollowBox>
       <ContectBox>
         <div className="contect">
@@ -130,7 +142,7 @@ const BoardHeader = () => {
         </div>
         {user_board != ("@" + loginUserData?.user_board) ?
           <div className={followState ? "followBtn true" : "followBtn false"}
-            onClick={follow}>
+            onClick={() => follow(thisBoard, loginUserData?.user_board)}>
             {followState ? "" : "팔로우"}
           </div> : <></>}
       </ContectBox>
@@ -240,6 +252,7 @@ const FollowBox = styled.div`
     height: 35px;
     border-radius: 20px;
     padding: 0 15px 0 15px;
+    cursor: pointer;
   }
     @media screen and (max-width: 1040px) {
     width: 100%;

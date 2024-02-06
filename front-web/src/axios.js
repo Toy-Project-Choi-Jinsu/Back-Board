@@ -1,11 +1,10 @@
 import axios from "axios";
 
 const instance = axios.create({
-  baseURL: "http://172.30.1.57:5555"
+  baseURL: "http://172.30.1.88:5555"
 });
 
 const setAuthToken = () => {
-  // delete instance.defaults.headers.common["Authorization"];
   const accessToken = localStorage.getItem("accessToken");
   if (accessToken) {
     instance.defaults.headers.common["Authorization"] = `Bearer ${accessToken}`

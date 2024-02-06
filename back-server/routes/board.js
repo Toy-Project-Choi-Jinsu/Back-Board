@@ -33,6 +33,45 @@ router.post("/getFollowState", async (req, res) => {
     }
 });
 
+// 팔로워, 팔로잉 수 조회
+router.post("/getFollowNumber", async (req, res) => {
+    console.log("getFollowNumber");
+    const { thisBoard } = req.body;
+    try {
+        const followNumber = await boardController.getFollowNumber(thisBoard);
+        res.json({ followNumber: followNumber })
+    } catch (err) {
+        console.log("[GetFollowNumber ERROR] : ", err);
+        res.json({ followNumber: false });
+    }
+});
+
+// 팔로워 리스트 조회
+router.post("/getFollowerList", async (req, res) => {
+    console.log("getFollowerList");
+    const { thisBoard, loginBoard } = req.body;
+    try {
+        const followerList = await boardController.getFollowerList(thisBoard, loginBoard);
+        res.json({ followerList: followerList })
+    } catch (err) {
+        console.log("[GetFollowerList ERROR] : ", err);
+        res.json({ followerList: false });
+    }
+});
+
+// 팔로잉 리스트 조회
+router.post("/getFollowingList", async (req, res) => {
+    console.log("getFollowingList");
+    const { thisBoard } = req.body;
+    try {
+        const followingList = await boardController.getFollowingList(thisBoard);
+        res.json({ followingList: followingList })
+    } catch (err) {
+        console.log("[GetFollowingList ERROR] : ", err);
+        res.json({ followingList: false });
+    }
+});
+
 // 팔로우
 router.post("/followingBoard", async (req, res) => {
     console.log("followingBoard");

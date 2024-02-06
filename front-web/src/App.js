@@ -16,6 +16,7 @@ import BoardDetail from "./components/2.Board/BoardDetail";
 import BoardList from "./components/2.Board/BoardList";
 import BoardSeries from "./components/2.Board/BoardSeries";
 import BoardIntro from "./components/2.Board/BoardIntro";
+import Follow from "./components/2.Board/Follow";
 
 function App() {
   const accessToken = JSON.parse(localStorage.getItem("accessToken"));
@@ -52,6 +53,8 @@ function App() {
             <Route path="/:user_board/list" element={<BoardList />}></Route>
             <Route path="/:user_board/series" element={<BoardSeries />}></Route>
             <Route path="/:user_board/intro" element={<BoardIntro />}></Route>
+            <Route path="/:user_board/followers" element={<Follow />}></Route>
+            <Route path="/:user_board/followings" element={<Follow />}></Route>
             <Route path="/:user_board/:bd_title" element={<BoardDetail />}></Route>
           </Route>
           <Route path="/tempwrite" element={<TempWrite />}></Route>
