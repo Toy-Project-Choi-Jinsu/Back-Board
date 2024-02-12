@@ -13,31 +13,22 @@ const BasicInfo = () => {
     const file = e.target.files[0];
     if (file) {
       const formData = new FormData();
-      formData.append('key', 'c45fbb5e972123a41582662a153f7f38');
       formData.append('image', file);
-      formData.append('name', userData?.user_email);
 
       try {
-        delete axios.defaults.headers.common["Authorization"];
-        const response = await axios.post('https://api.imgbb.com/1/upload', formData);
-
-        if (response.data.success) {
-          const imageUrl = response.data.data.url;
-          const accessToken = localStorage.getItem("accessToken");
-          axios.defaults.headers.common["Authorization"] = `Bearer ${accessToken}`
-          axios.post('/mypage/changeImg', { url: imageUrl }).then((res) => {
-            if (res.data.changeImgResult) {
-              alert("이미지 변경이 완료되었습니다.")
-              userData.user_profile_img = imageUrl
-              window.location.replace('/mypage')
-            } else {
-              alert("이미지 업로드 중 오류가 발생했습니다.");
-            }
-          })
-        } else {
-          console.error('Image upload failed:', response.data);
-          alert("이미지 업로드 중 오류가 발생했습니다.");
-        }
+        axios.post('/image/changeImg', formData, {
+          headers: {
+            "Content-Type": "multipart/form-data",
+          },
+        }).then((res) => {
+          if (res.data.changeImgResult) {
+            alert("이미지 변경이 완료되었습니다.")
+            userData.user_profile_img = res.data.changeImgResult
+            window.location.replace('/mypage')
+          } else {
+            alert("이미지 업로드 중 오류가 발생했습니다.");
+          }
+        })
       } catch (error) {
         console.error('Error uploading image:', error.message);
         alert("이미지 업로드 중 오류가 발생했습니다.");

@@ -3,18 +3,6 @@ const router = express.Router();
 const jwtAuth = require("../controllers/jwtAuth");
 const mypageController = require("../controllers/mypageController");
 
-router.post('/changeImg', jwtAuth.verifyToken, async (req, res) => {
-    console.log("Change Image");
-    const { url } = req.body;
-    try {
-        await mypageController.changeImg(url, req.token);
-        res.json({ changeImgResult: true })
-    } catch (error) {
-        console.log("[ChangeImg ERROR] : ", err);
-        res.json({ chageImgResult: false });
-    }
-});
-
 router.post('/changeBasicInfo', jwtAuth.verifyToken, async (req, res) => {
     console.log("Change Basic Information");
     const { name, intro } = req.body;

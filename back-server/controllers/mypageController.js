@@ -1,15 +1,6 @@
 const db = require("./db");
 
 module.exports = {
-    changeImg: async (url, token) => {
-        const sql = "update t_user set user_profile_img=? where user_email=?";
-        try {
-            await db.query(sql, [url, token]);
-        } catch (error) {
-            throw error
-        }
-    },
-
     changeBasicInfo: async (name, intro, token) => {
         const sql = "update t_user set user_name=?, user_intro=? where user_email=?";
         try {

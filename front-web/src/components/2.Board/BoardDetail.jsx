@@ -1,4 +1,5 @@
-import React from 'react'
+import React, { useEffect, useState } from 'react'
+import styled from 'styled-components';
 
 const BoardDetail = () => {
     return (
@@ -9,3 +10,4 @@ const BoardDetail = () => {
 }
 
 export default BoardDetail
+
