@@ -29,6 +29,18 @@ router.post('/changeImg', jwtAuth.verifyToken, imageController.parser.single('im
     });
 });
 
+router.post('/uploadBoardImg', jwtAuth.verifyToken, imageController.parser.single('image'), async (req, res) => {
+    // Cloudinary에 이미지 업로드
+    cloudinary.uploader.upload(req.file.path, async (error, result) => {
+        try {
+            res.json({ uploadBoardImgResult: result.secure_url })
+        } catch (err) {
+            console.log("[UploadBoardImg ERROR] : ", error);
+            res.json({ uploadBoardImgResult: false });
+        }
+    });
+});
+
 // 게시글 정보 불러오기
 router.post("/getMainData", async (req, res) => {
     console.log("Get Main Data");

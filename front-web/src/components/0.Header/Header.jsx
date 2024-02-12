@@ -40,12 +40,12 @@ const Header = () => {
 
         <div className='menuBox'>
           {userData != null ?
-            <Link to='/newwrite'>
-              <div className='newwrite'>보드 작성</div>
+            <Link to='/newboard'>
+              <div className='newboard'>보드 작성</div>
             </Link>
             :
             <Link to='/login'>
-              <div className='newwrite'>로그인</div>
+              <div className='newboard'>로그인</div>
             </Link>}
 
 
@@ -118,7 +118,7 @@ const HeaderBox = styled.div`
   }
   }
 
-  & .newwrite{
+  & .newboard{
     display: flex;
     align-items: center;
     justify-content: center;

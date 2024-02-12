@@ -19,6 +19,9 @@ const BasicInfo = () => {
         axios.post('/image/changeImg', formData, {
           headers: {
             "Content-Type": "multipart/form-data",
+            "type": 'profile_img',
+            "id": userData.user_email,
+            "overwrite": true
           },
         }).then((res) => {
           if (res.data.changeImgResult) {

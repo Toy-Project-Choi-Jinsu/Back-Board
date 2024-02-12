@@ -6,7 +6,7 @@ import Header from "./components/0.Header/Header";
 import Main from "./components/1.Main/Main";
 import Board from "./components/2.Board/Board";
 import TempWrite from "./components/3.TempWrite/TempWrite";
-import NewWrite from "./components/4.NewWrite/NewWrite";
+import NewBoard from "./components/4.NewBoard/NewBoard";
 import Read from "./components/5.Read/Read";
 import MyPage from "./components/6.MyPage/MyPage";
 import Login from "./components/0.Header/Login";
@@ -58,7 +58,7 @@ function App() {
             <Route path="/:user_board/:bd_title" element={<BoardDetail />}></Route>
           </Route>
           <Route path="/tempwrite" element={<TempWrite />}></Route>
-          <Route path="/newwrite" element={<NewWrite />}></Route>
+          <Route path="/newboard" element={<NewBoard />}></Route>
           <Route path="/read" element={<Read />}></Route>
           <Route path="/mypage" element={<MyPage />}></Route>
         </Routes>
